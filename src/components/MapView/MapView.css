@@ -1,0 +1,35 @@
+.MapView {
+  flex: 1;
+  border: 1px solid #ccc;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.SearchBoxContainer {
+  position: absolute;
+  top: 20px;
+  z-index:10;
+}
+
+.UseMyLocationContainer {
+  position: absolute;
+  bottom: 110px;
+  right: 11px;
+  padding: 5px;
+  z-index: 10;
+  background-color: #fff;
+  box-shadow: rgba(0, 0, 0, 0.3) 0px 1px 4px -1px;
+  border-radius: 2px;
+}
+
+.UseMyLocationContainer:hover {
+  cursor: pointer;
+  background-color: #72bcd4;
+}
+
+@media only screen and (max-width: 600px){
+  .UseMyLocationContainer{
+    display: none;
+  }
+}

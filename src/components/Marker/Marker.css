@@ -1,0 +1,21 @@
+.marker{
+  width: 30px;
+  height: 30px;
+  border-radius: 50% 50% 50% 0;
+  background: #CA091A;
+  position: absolute;
+  transform: rotate(-45deg);
+  left: 50%;
+  top: 50%;
+  margin: -10px 0 0 -15px;
+}
+
+.img{
+  padding:2px;
+  transform: rotate(45deg);
+  background-color: #fff;
+  border-radius: 50%;
+  width:15px;
+  height:15px;
+  margin:5px;
+}
