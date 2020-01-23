@@ -6,6 +6,8 @@ import GoogleMapReact from "google-map-react";
 import PropTypes from "prop-types";
 import Marker from "../Marker/Marker";
 import { GOOGLE_API_KEY as apiKey } from "../../constants";
+import MarkerClusterer from '@google/markerclusterer'
+
 class MapView extends React.PureComponent {
   constructor(props) {
     super(props);
@@ -23,7 +25,7 @@ class MapView extends React.PureComponent {
     this.fetchData(details.lat, details.lng);
   };
 
-  fetchData = async (latitude, longitude) => {
+  fetchData = async (latitude, longitude, isZoom = true) => {
     const { mapInstance, mapApi } = this.state;
     const latlng = { lat: latitude, lng: longitude };
     const request = {
@@ -37,11 +39,13 @@ class MapView extends React.PureComponent {
       if (status === "OK") {
         const { 0: place } = results;
         if (!place.geometry) return;
-        if (place.geometry.viewport) {
-          mapInstance.fitBounds(place.geometry.viewport);
-        } else {
-          mapInstance.setCenter(place.geometry.location);
-          mapInstance.setZoom(17);
+        if (isZoom) {
+          if (place.geometry.viewport) {
+            mapInstance.fitBounds(place.geometry.viewport);
+          } else {
+            mapInstance.setCenter(place.geometry.location);
+            mapInstance.setZoom(17);
+          }
         }
         this.addPlace(results);
       }
@@ -79,7 +83,24 @@ class MapView extends React.PureComponent {
   addPlace = (place) => {
     this.setState({ places: place });
     this.props.setSearchList(place);
+
+    const { mapInstance, places, mapApi } = this.state;
+    let markers = places.map((place) => {
+      return new mapApi.Marker({ position: place.geometry.location })
+    })
+    new MarkerClusterer(mapInstance, markers, {
+      imagePath: 'https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m',
+      gridSize: 10,
+      minimumClusterSize: 2
+    });
+
   };
+
+  boundsChanged = (event) => {
+    if (event) {
+      this.fetchData(event.data.map.center.lat(), event.data.map.center.lng(), false);
+    }
+  }
 
   render() {
     const { places, mapApiLoaded, mapInstance, mapApi, } = this.state;
@@ -116,17 +137,8 @@ class MapView extends React.PureComponent {
           defaultZoom={15}
           onClick={this.handleMapClicked}
           onGoogleApiLoaded={({ map, maps }) => this.apiHasLoaded(map, maps)}
+          onDragEnd={(event) => { this.boundsChanged(event) }}
         >
-          {places.length &&
-            places.map(place => (
-              <Marker
-                key={place.id}
-                text={place.name}
-                lat={place.geometry.location.lat()}
-                lng={place.geometry.location.lng()}
-                icon={place.icon}
-              />
-            ))}
         </GoogleMapReact>
       </div>
     );
